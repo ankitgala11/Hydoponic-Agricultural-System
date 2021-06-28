@@ -1,3 +1,10 @@
+<?php
+
+session_start();
+ob_start();
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,19 +18,51 @@
 
     <title>SB Admin 2 - Login</title>
 
-    <!-- Custom fonts for this template-->
-    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
-
-    <!-- Custom styles for this template-->
-    <link href="css/sb-admin-2.css" rel="stylesheet">
+ 
+    <?php include 'css/style.php' ?>
+    <?php include 'links/links.php' ?>
 
 </head>
 
 <body class="bg-gradient-primary">
 
+
+<?php
+include 'dbcon.php';
+if(isset($_POST['submit'])){
+
+$email = mysqli_real_escape_string($con, $_POST['email']);
+$password = mysqli_real_escape_string($con, $_POST['password']);
+
+    $email_search ="select * from registration where email='$email' ";
+    $query= mysqli_query($con, $email_search);
+    $emailcount= mysqli_num_rows($query);
+
+    if($emailcount){
+    $email_pass= mysqli_fetch_assoc($query);
+    $db_pass=$email_pass['password'];
+    $_SESSION['fname']=$email_pass['fname'];
+    $pass_decode = password_verify($password, $db_pass);
+    if($pass_decode){
+        echo "login successful";
+
+        if(isset($_POST['rememberme'])){
+
+            setcookie('emailcookie',$email,time()+86400);
+            setcookie('passwordcookie',$password,time()+86400);
+            header('location:index.php');
+        }else{
+             header('location:index.php');
+        }
+       
+    }else{
+        echo "Invalid email or password";
+    }
+    }else{
+        echo "Invalid email or password";
+    }
+}
+?>
     <div class="container">
 
         <!-- Outer Row -->
@@ -41,40 +80,42 @@
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
                                     </div>
-                                    <form class="user">
+                                    <form action="<?php echo htmlentities($_SERVER['PHP_SELF']);?> " method="POST" class="user">
                                         <div class="form-group">
                                             <input type="email" class="form-control form-control-user"
-                                                id="exampleInputEmail" aria-describedby="emailHelp"
+                                                id="exampleInputEmail" aria-describedby="emailHelp" name="email" 
+                                                value= "<?php if(isset($_COOKIE['emailcookie'])) { echo $_COOKIE['emailcookie']; } ?>"
                                                 placeholder="Enter Email Address...">
                                         </div>
                                         <div class="form-group">
-                                            <input type="password" class="form-control form-control-user"
+                                            <input type="password" class="form-control form-control-user" name="password"
+                                            value= "<?php if(isset($_COOKIE['passwordcookie'])) { echo $_COOKIE['passwordcookie']; } ?>"
                                                 id="exampleInputPassword" placeholder="Password">
                                         </div>
                                         <div class="form-group">
                                             <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck">
+                                                <input type="checkbox" name="rememberme" class="custom-control-input" id="customCheck">
                                                 <label class="custom-control-label" for="customCheck">Remember
                                                     Me</label>
                                             </div>
                                         </div>
-                                        <a href="index.html" class="btn btn-primary btn-user btn-block">
+                                        <button type="submit" name="submit" class="btn btn-primary btn-user btn-block">
                                             Login
-                                        </a>
+                                        </button>
                                         <hr>
-                                        <a href="index.html" class="btn btn-google btn-user btn-block">
+                                        <!-- <a href="index.html" class="btn btn-google btn-user btn-block">
                                             <i class="fab fa-google fa-fw"></i> Login with Google
-                                        </a>
-                                        <a href="index.html" class="btn btn-facebook btn-user btn-block">
+                                        </a> -->
+                                        <!-- <a href="index.html" class="btn btn-facebook btn-user btn-block">
                                             <i class="fab fa-facebook-f fa-fw"></i> Login with Facebook
-                                        </a>
+                                        </a> -->
                                     </form>
                                     <hr>
-                                    <div class="text-center">
+                                    <!-- <div class="text-center">
                                         <a class="small" href="forgot-password.html">Forgot Password?</a>
-                                    </div>
+                                    </div> -->
                                     <div class="text-center">
-                                        <a class="small" href="register.html">Create an Account!</a>
+                                        <a class="small" href="register.php">Create an Account!</a>
                                     </div>
                                 </div>
                             </div>
