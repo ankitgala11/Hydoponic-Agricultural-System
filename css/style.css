@@ -17,7 +17,7 @@ input[type="range"]{
     background-color: transparent;
     pointer-events: none;
 }
-.slider-track{
+.slider-track1 , .slider-track2 , .slider-track3 , .slider-track4, .slider-track5 , .slider-track6 , .slider-track7{
     width: 80%;
     height: 11px;
     position: absolute;
